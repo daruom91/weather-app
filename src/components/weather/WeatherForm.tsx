@@ -24,6 +24,7 @@ import {
 } from "react-icons/wi";
 
 export default function WeatherForm() {
+  const regex = /^[a-f0-9]{32}$/;
   const { getCities, setApiKey, setQuery, query, apiKey, cities, loading } = useWeatherStore() as {
     getCities: () => void;
     setApiKey: (key: string) => void;
@@ -34,7 +35,11 @@ export default function WeatherForm() {
     loading: boolean;
   };
   const [openDetailModal, setOpenDetailModal] = useState(false);
-  const [selectedCity, setSelectedCity] = useState<City & { weather?: WeatherCity }>();
+  const [selectedCity, setSelectedCity] = useState<City>();
+  const [weather, setWeather] = useState<WeatherCity>();
+  const [isValid, setIsValid] = useState<boolean | null>(regex.test(apiKey));
+
+  // Regex for 32-character lowercase hex
 
   const debounceSearch = useMemo(
     () =>
@@ -44,22 +49,15 @@ export default function WeatherForm() {
     [setQuery]
   );
 
-  const handleGetWeather = async () => {
-    if (selectedCity) {
-      const weatherService = new WeatherService();
-
-      const weather = await weatherService.getWeatherCity(
-        selectedCity.lat,
-        selectedCity.lon,
-        apiKey
-      );
-      setSelectedCity({ ...selectedCity, weather });
-      console.log({ ...selectedCity, weather });
-    }
+  const handleGetWeather = async (lat: number, long: number) => {
+    const weatherService = new WeatherService();
+    const weather = await weatherService.getWeatherCity(lat, long, apiKey);
+    console.log("weather:", weather);
+    setWeather(weather);
   };
 
   const getWeatherIcon = (condition: string) => {
-    const iconClass = "text-black";
+    const iconClass = "text-white";
     const size = 80;
 
     switch (condition?.toLowerCase()) {
@@ -94,10 +92,12 @@ export default function WeatherForm() {
             value={apiKey}
             iconDirection="right"
             onChange={(value) => {
+              setIsValid(regex.test(value) as unknown as null);
               setApiKey(value);
             }}
             required
             icon={<MdKey />}
+            error={!isValid ? "La clé n'est pas valide" : ""}
           />
           <Input
             type="text"
@@ -149,7 +149,7 @@ export default function WeatherForm() {
                       className=" hover:text-gray-900 font-medium cursor-pointer"
                       onClick={async () => {
                         setSelectedCity(city);
-                        await handleGetWeather();
+                        await handleGetWeather(city.lat, city.lon);
                         setOpenDetailModal(true);
                       }}
                     >
@@ -174,49 +174,36 @@ export default function WeatherForm() {
         )}
       </div>
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
-        {getWeatherIcon(selectedCity?.weather?.weather[0]?.main || "")}
-        <div className="flex flex-col justify-center items-center">
-          <h2 className="text-2xl font-bold mb-4">Détails de la ville</h2>
-          <p className="text-lg">Nom de la ville: {selectedCity?.name}</p>
-          <p className="text-lg">Pays: {selectedCity?.country}</p>
-          <p className="text-lg">Région: {selectedCity?.state || "-"}</p>
-          <p className="text-lg">
-            Température: {Math.round(selectedCity?.weather?.main?.temp!) || "-"}
-            °C
-          </p>
-          <p className="text-lg">
-            Température ressentie:{" "}
-            {selectedCity?.weather?.main?.feels_like
-              ? Math.round(selectedCity?.weather?.main?.feels_like)
-              : "-"}
-            °C
-          </p>
-          <p className="text-lg">
-            Température minimale:{" "}
-            {selectedCity?.weather?.main?.temp_min
-              ? Math.round(selectedCity?.weather?.main?.temp_min)
-              : "-"}
-            °C
-          </p>
-          <p className="text-lg">
-            Température maximale:{" "}
-            {selectedCity?.weather?.main?.temp_max
-              ? Math.round(selectedCity?.weather?.main?.temp_max)
-              : "-"}
-            °C
-          </p>
-          <p className="text-lg">
-            Humidité:{" "}
-            {selectedCity?.weather?.main?.humidity
-              ? `${selectedCity?.weather?.main?.humidity} %`
-              : "-"}
-          </p>
-          <p className="text-lg">
-            Vents:{" "}
-            {selectedCity?.weather?.wind?.speed
-              ? `${Math.round(selectedCity?.weather?.wind?.speed * 3.6)} Km/h`
-              : "-"}
-          </p>
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg p-8 w-full max-w-md text-white">
+          <div className="flex flex-col items-center">
+            <h2 className="text-4xl font-bold mb-2">
+              {selectedCity?.name}, {selectedCity?.country}
+            </h2>
+            <p className="text-lg mb-6">{selectedCity?.state || ""}</p>
+            <div className="text-8xl mb-6">{getWeatherIcon(weather?.weather[0]?.main || "")}</div>
+            <div className="text-5xl font-bold mb-6">{Math.round(weather?.main?.temp!)}°C</div>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-lg">
+              <div className="flex items-center gap-2">
+                <WiThermometerExterior size={30} />
+                <span>Ressenti: {Math.round(weather?.main?.feels_like!)}°C</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <WiHumidity size={30} />
+                <span>Humidité: {weather?.main?.humidity}%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <WiStrongWind size={30} />
+                <span>Vent: {Math.round(weather?.wind?.speed! * 3.6)} km/h</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <WiThermometer size={30} />
+                <span>
+                  Min/Max: {Math.round(weather?.main?.temp_min!)}°/
+                  {Math.round(weather?.main?.temp_max!)}°
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </Modal>
     </div>
