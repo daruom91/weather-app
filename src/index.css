@@ -1,0 +1,44 @@
+@import "tailwindcss";
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+ padding: 20px;
+ /* background-color: #c4c4c4cb; */
+ width: 100vw;
+ min-height: 100vh;
+ background-image: url("./assets/bg.png");
+ background-size: 100% 100vh;
+ /* background-position: center; */
+ background-repeat: repeat;
+ background-color: #c4c4c4cb;
+
+}
+
+.blur-content {
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  border-radius: 10px;
+   color: #fff;
+}
+
+.blur-content-table {
+  border: 1px solid #fff;
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  border-radius: 10px;
+   color: #fff;
+}
+
+.blur-content-table thead {
+  backdrop-filter: blur(20px);
+  color: #fff;
+}
+
+
+.blur-content-table tbody {
+  backdrop-filter: blur(20px);
+}
