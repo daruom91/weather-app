@@ -81,6 +81,12 @@ export default function WeatherForm() {
     }
   };
 
+  const handleOpenDetail = async (city: City) => {
+    setSelectedCity(city);
+    await handleGetWeather(city.lat, city.lon);
+    setOpenDetailModal(true);
+  };
+
   return (
     <div>
       <div className="flex flex-col justify-center  blur-content ">
@@ -108,7 +114,7 @@ export default function WeatherForm() {
               getCities();
             }}
             iconDirection="right"
-            disabled={!apiKey}
+            disabled={!apiKey || !isValid}
             onChange={(value) => {
               debounceSearch();
               setQuery(value);
@@ -140,17 +146,21 @@ export default function WeatherForm() {
             </thead>
             <tbody className=" divide-y divide-gray-200">
               {cities.map((city, index) => (
-                <tr key={`${city.name}-${index}`} className="hover:bg-gray-100/50">
+                <tr
+                  key={`${city.name}-${index}`}
+                  className="cursor-pointer hover:bg-gray-100/50"
+                  onClick={async () => {
+                    handleOpenDetail(city);
+                  }}
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm ">{city.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm ">{city.country}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm ">{city.state || "-"}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button
-                      className=" hover:text-gray-900 font-medium cursor-pointer"
+                      className=" hover:text-amber-500 font-medium cursor-pointer"
                       onClick={async () => {
-                        setSelectedCity(city);
-                        await handleGetWeather(city.lat, city.lon);
-                        setOpenDetailModal(true);
+                        handleOpenDetail(city);
                       }}
                     >
                       <FaCity />

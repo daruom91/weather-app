@@ -4,10 +4,10 @@ import { WeatherService } from "../weather.service";
 
 export const useWeatherStore = create((set, get) => ({
   cities: [] as City[],
-  query: "tunis",
+  query: "",
   loading: false,
   setLoading: (loading: boolean) => set({ loading }),
-  apiKey: "80e8d7b67f8c2737afd345246e8c065f",
+  apiKey: import.meta.env.VITE_OWM_KEY || "",
   limit: 10,
   setQuery: (query: string) => set({ query }),
   setApiKey: (apiKey: string) => set({ apiKey }),
