@@ -7,7 +7,7 @@ export const useWeatherStore = create((set, get) => ({
   query: "tunis",
   loading: false,
   setLoading: (loading: boolean) => set({ loading }),
-  apiKey: "80e8d7b67f8c2737afd345246e8c065f",
+  apiKey: "",
   limit: 10,
   setQuery: (query: string) => set({ query }),
   setApiKey: (apiKey: string) => set({ apiKey }),
