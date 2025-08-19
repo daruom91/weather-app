@@ -6,8 +6,8 @@ function App() {
     <>
       <div className="">
         <div className="header">
-          <h1 className="text-5xl text-center font-bold text-amber-200 tracking-wide hover:text-white transition-all duration-300 animate-bounce-slow [text-shadow:_2px_2px_1px_#164e63] ">
-            Weather App
+          <h1 className="text-4xl text-center font-bold text-white tracking-wide hover:text-amber-200 transition-all duration-300 animate-bounce-slow [text-shadow:_2px_2px_1px_#164e63] ">
+            Tempéris
           </h1>
         </div>
         <div className="content">
